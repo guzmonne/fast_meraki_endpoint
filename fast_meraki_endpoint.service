@@ -1,0 +1,33 @@
+[Unit]
+Description=Fast Meraki Endpoint service
+ConditionPathExists=/usr/bin/fast_meraki_endpoint
+After=network.target
+
+[Service]
+Type=simple
+User=fast_meraki_endpoint
+Group=fast_meraki_endpoint
+LimitNOFILE=1024
+
+Restart=on-failure
+RestartSec=10
+startLimitIntervalSec=60
+
+WorkingDirectory=/srv/fast_meraki_endpoint
+# Configure the necessary options to run the service on your setup
+# ExecStart=/usr/bin/fast_meraki_endpoint --port="8080" --bucket="some.bucket" --secret="s3cr3t" --validator="d283..."
+# To use it in standalone mode serving http, remember to configure the ssl ans server options besides the other options
+# ExecStart=/usr/bin/fast_meraki_endpoint --port="443" --server-crt="/path/to/crt" --server-key="path/to/key"
+ExecStart=/usr/bin/fast_meraki_endpoint
+
+# Make sure log directory exists and owned by syslog
+PermissionsStartOnly=true
+ExecStartPre=/bin/mkdir -p /var/log/fast_meraki_endpoint
+ExecStartPre=/bin/chown syslog:adm /var/log/fast_meraki_endpoint
+ExecStartPre=/bin/chmod 755 /var/log/fast_meraki_endpoint
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=fast_meraki_endpoint
+ 
+[Install]
+WantedBy=multi-user.target
